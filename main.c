@@ -13,6 +13,9 @@ HANDLE Thread;
 //Função da thread principal
 DWORD WINAPI MainThread(LPVOID lpParam)
 {
+        
+    mapax = 0;
+    mapay = 800;
     srand(time(NULL));
     //Se o jogo for reiniciado depois do game over, esta flag é falsa e o mapa não é gerado
     HWND hwnd = *((HWND *)lpParam);//Recupera-se o Handle para a janela do parâmetro da thread
@@ -46,9 +49,9 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 	}
     int gameover = 0, count = 0;
     character player;
-    SpawnPlayer(&player);
 
     zombie zombie;
+    SpawnPlayer(&player, &zombie);
     zombie.baseLife = 10;
     SpawnZombie(&zombie, &player);
     
@@ -79,6 +82,7 @@ DWORD WINAPI MainThread(LPVOID lpParam)
         HDC hdc = GetDC(hwnd);
         RECT R;
         GetClientRect(hwnd, &R);
+        CenterPlayer(&player, &zombie);
         /*
         Para se desenhar na tela, se cria um handle HDC compatível com a tela na memória (TempDC).
         Selecionamos um bitmap neste HDC para definir o tamanho e as cores.

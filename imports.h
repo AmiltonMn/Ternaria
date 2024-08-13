@@ -14,6 +14,7 @@ Essa header possui todos os imports que precisamos, para garantir que não vai d
 
 int mapax = 0;
 int mapay = 800;
+int DirtLife = 3, LogLife = 4, StoneLife = 4, LeavesLife = 1, GrassLife = 4;
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -56,10 +56,14 @@ int DestroyBlocks(character * Player, POINT Mouse)
         block * B = (block *) Map.List[i];
         if(PtInRect(&B->hitbox, Mouse))
         {
-            free(B);
-            DArrayRemove(&Map, i);
-            RemoveBlockArchive(&Map, B);
-            return 1;
+            if (B->life == 0)
+            {
+                free(B);
+                DArrayRemove(&Map, i);
+                WriteArchive(&Map);
+                return 1;
+            }
+            B->life -= 1;
         }
     }
     return 0;
@@ -76,6 +80,33 @@ int PlaceBlocks(character * Player, zombie * Zombie, POINT Mouse, int Type)
     B->x = (Mouse.x + mapax) / 32;
     B->y = (1010 - Mouse.y + mapay) / 32 ;
     B->type = Type;
+
+    switch (B->type)
+    {
+    case 1:
+        B->life = GrassLife;
+        break;
+
+    case 2:
+        B->life = DirtLife;
+        break;
+
+    case 3:
+        B->life = LogLife;
+        break;
+
+    case 4:
+        B->life = LeavesLife;
+        break;
+
+    case 5:
+        B->life = StoneLife;
+        break;  
+
+    default:
+        break;
+    }
+
     int canPlace = 0;
     BlockDefine(B);
     if(Collision(&B->hitbox, &Player->hitbox) || Collision(&B->hitbox, &Zombie->hitbox))
@@ -169,12 +200,9 @@ void SpawnZombie(zombie * Zombie, const character * Player)
 }
 
 //Função para criar o jogador
-void SpawnPlayer(character * Player)
+void SpawnPlayer(character * Player, zombie * Zombie)
 {
-    Player->hitbox.left = 944;
-    Player->hitbox.right = Player->hitbox.left + 31;
-    Player->hitbox.top = 572;
-    Player->hitbox.bottom = 508;
+    CenterPlayer(Player, Zombie);
     if(!MapCollision(&Player->hitbox))
     {
         Player->hitbox.bottom = Player->hitbox.top + 63;
@@ -373,6 +401,9 @@ void MoveZombie(character * player, zombie * zombie)
     {
         int left = player->hitbox.left;
         int right = player->hitbox.right;
+        int top = player->hitbox.top;
+        int bottom = player->hitbox.bottom;
+
         if(zombie->hitbox.right < right)
         {
             MoveRightZombie(zombie, 2);
@@ -380,6 +411,30 @@ void MoveZombie(character * player, zombie * zombie)
         if(zombie->hitbox.left > left)
         {
             MoveLeftZombie(zombie, 2);
+        } 
+        else
+        {
+            if (zombie->hitbox.bottom < top)
+            {
+                zombie->hitbox.bottom += 5;
+                block * B = MapCollision(&zombie->hitbox);
+                if (Collision(&zombie->hitbox, &B->hitbox))
+                {
+                    if (B->life == 0)
+                    {
+                        free(B);
+                        DArrayRemove(&Map, B.);
+                        WriteArchive(&Map);
+                    }
+                    B->life -= 1;
+                }
+                zombie->hitbox.bottom -= 5;
+            }
+            else if (zombie->hitbox.top < bottom)
+            {
+
+            }
+            
         }
     }
     ZombieGravity(zombie);
@@ -433,4 +488,25 @@ int EstragarVelorio(zombie * Zombie, character * Player, POINT Mouse)
         return (Zombie->hitbox.left + 16) - (Player->hitbox.left + 15);
     }
     return 0;
+}
+
+void CenterPlayer(character * Player, zombie * Zombie)
+{
+    RECT ClientRect;
+    GetClientRect(Ghwnd, &ClientRect);
+    ClientRect.left = (ClientRect.right - ClientRect.left) >> 1;
+    ClientRect.top = (ClientRect.bottom - ClientRect.top) >> 1;
+
+    ClientRect.left = ClientRect.left - 16;
+    ClientRect.right = ClientRect.left + 31;
+    ClientRect.top = ClientRect.top - 32;
+    ClientRect.bottom = ClientRect.top + 63;
+
+    mapax -= ClientRect.left - Player->hitbox.left;
+    mapay += ClientRect.top - Player->hitbox.top;
+
+    MoveDownZombie(Zombie, ClientRect.top - Player->hitbox.top);
+    MoveRightZombie(Zombie, ClientRect.left - Player->hitbox.left);
+
+    Player->hitbox = ClientRect;
 }

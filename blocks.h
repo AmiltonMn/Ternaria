@@ -12,6 +12,7 @@ typedef struct block
     int x;//posições simplificadas
     int y;
     int type;
+    int life;
     wchar_t * img;//Caminho para a imagem que deve ser desenhada
 } block;
 
@@ -25,23 +26,81 @@ void BlockDefine(block * B)
     switch (B->type)
     {
     case 1:
-        B->img = L"Grama";
+        switch (B->life)
+        {
+            case 1:
+                B->img = L"GramaQ3";
+                break;            
+
+            case 2:
+                B->img = L"GramaQ2";
+                break;
+
+            case 3:
+                B->img = L"GramaQ1";
+                break;
+            
+            case 4:
+                B->img = L"Grama";
+                break;
+            
+            default:
+                break;
+        }
         break;
 
     case 2:
-        B->img = L"Terra";
+        switch (B->life)
+        {
+            case 1:
+                B->img = L"TerraQ2";
+                break;
+
+            case 2:
+                B->img = L"TerraQ1";
+                break;
+
+            case 3:
+                B->img = L"Terra";
+                break;
+                
+            default:
+                break;
+        }
         break;
 
     case 3:
-        B->img = L"Tronco";
+        switch (B->life)
+        {
+            case 1:
+                B->img = L"TroncoQ3";
+                break;            
+
+            case 2:
+                B->img = L"TroncoQ2";
+                break;
+
+            case 3:
+                B->img = L"TroncoQ1";
+                break;
+            
+            case 4:
+                B->img = L"Tronco";
+                break;
+            
+            default:
+                break;
+        }
         break;
 
     case 4:
         B->img = L"Folhas";
+        B->life = 1;
         break;
 
     case 5:
         B->img = L"Stone";
+        B->life = 3;
         break;
 
     default:
@@ -128,6 +187,31 @@ void ReadArchive(DArray *lista)
         ++count;
         block *bloco = malloc(sizeof(block));
         fscanf(File, "%i,%i,%i", &bloco->x, &bloco->y, &bloco->type);
+                switch (bloco->type)
+        {
+            case 1:
+                bloco->life = GrassLife;
+                break;
+
+            case 2:
+                bloco->life = DirtLife;
+                break;
+
+            case 3:
+                bloco->life = LogLife;
+                break;
+
+            case 4:
+                bloco->life = LeavesLife;
+                break;
+
+            case 5:
+                bloco->life = StoneLife;
+                break;
+            
+            default:
+                break;
+        }
         BlockDefine(bloco);
         if((bloco->x*32) < -(5 * 32) + mapax || (bloco->x*32) > (60 * 32) + mapax || (bloco->y*32) > (30 * 32) + mapay || (bloco->y*32) < -(5 * 32) + mapay)
         {
