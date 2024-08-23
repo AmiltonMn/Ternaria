@@ -60,7 +60,7 @@ int DestroyBlocks(character * Player, POINT Mouse)
             {
                 free(B);
                 DArrayRemove(&Map, i);
-                WriteArchive(&Map);
+                // WriteArchive(&Map);
                 return 1;
             }
             B->life -= 1;
@@ -423,7 +423,7 @@ void MoveZombie(character * player, zombie * zombie)
                     if (B->life == 0)
                     {
                         free(B);
-                        DArrayRemove(&Map, B.);
+                        DArrayRemove(&Map, B);
                         WriteArchive(&Map);
                     }
                     B->life -= 1;

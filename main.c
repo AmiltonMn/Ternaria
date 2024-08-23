@@ -127,6 +127,7 @@ DWORD WINAPI MainThread(LPVOID lpParam)
         {
             RenderZombie(&zombie, TempDC);
         }
+        
         RenderPlayer(&player, TempDC);
         RenderTool(&player, TempDC);
 
@@ -165,6 +166,7 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 
         WaitForSingleObject(Timer, INFINITE);//Aqui se espera até o timer terminar
     }
+
     hdc = GetDC(hwnd);
     RenderLogo(hdc, 1);
     RenderMenu(Mode);
